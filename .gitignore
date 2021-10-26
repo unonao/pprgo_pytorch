@@ -4,5 +4,9 @@ pprgo.egg-info
 __pycache__
 .ipynb_checkpoints
 
-data/reddit.npz
+*.npz
 *.egg-info
+.config
+db/
+configdb/
+slurm_out/

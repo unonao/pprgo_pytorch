@@ -7,14 +7,14 @@ seml:
 slurm:
   experiments_per_job: 1
   sbatch_options:
-    gres: 'gpu:"GeForce GTX 1080 Ti":1'
-    mem: 32G                  # Main memory
-    cpus-per-task: 5          # CPU cores
+    gres: 'gpu:"GeForce RTX 2080 Ti":1'
+    mem: 64G                  # Main memory
+    cpus-per-task: 16          # CPU cores
     time: 1-00:00             # Maximum runtime, D-HH:MM
     partition: [gpu_all]
 
 fixed:
-  data_dir: /nfs/shared/data/ # Directory containing .npz data files
+  data_dir: ./data/ # Directory containing .npz data files
   ntrain_div_classes: 20      # Number of training nodes divided by number of classes
   attr_normalization: None    # Attribute normalization. Not used in the paper
   topk: 32                    # Number of PPR neighbors for each node

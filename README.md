@@ -1,9 +1,22 @@
 # PPRGo (PyTorch)
+```
+docker build -t pprgo .
+docker run --gpus all --rm -it -v $(pwd):/home pprgo python
+docker run --gpus all --rm -it -v $(pwd):/home pprgo bash
+```
+
+```
+docker-compose up
+docker-compose exec pprgo bash
+docker-compose exec mongo bash
+seml config_seml add config_seml.yaml
+seml config_seml start
+```
 
 This repository provides a PyTorch implementation of PPRGo for a single machine. You can find the [original TensorFlow 1 implementation in another repository](https://github.com/TUM-DAML/pprgo). PPRGo is a fast GNN able to scale to massive graphs in both single-machine and distributed setups. It was proposed in our paper
 
-**[Scaling Graph Neural Networks with Approximate PageRank](https://www.daml.in.tum.de/pprgo)**   
-by Aleksandar Bojchevski*, Johannes Klicpera*, Bryan Perozzi, Amol Kapoor, Martin Blais, Benedek Rózemberczki, Michal Lukasik, Stephan Günnemann  
+**[Scaling Graph Neural Networks with Approximate PageRank](https://www.daml.in.tum.de/pprgo)**
+by Aleksandar Bojchevski*, Johannes Klicpera*, Bryan Perozzi, Amol Kapoor, Martin Blais, Benedek Rózemberczki, Michal Lukasik, Stephan Günnemann
 Published at ACM SIGKDD 2020.
 
 ## Demonstration
