@@ -32,6 +32,37 @@ class PPRGo(nn.Module):
 
     def forward(self, X, ppr_scores, ppr_idx):
         logits = self.mlp(X)
+
+
+        """
+        https://pytorch-scatter.readthedocs.io/en/latest/functions/scatter.html
+        X: PPRの対象となる頂点 x 属性数
+        ppr_scores: X に対応するpprのスコア
+        ppr_idx: source となる頂点
+
+        XをNNにかけて出てきた特徴量を、pprで重み付けし、対応するsourceにsumで合わせる
+        """
+        propagated_logits = scatter(logits * ppr_scores[:, None], ppr_idx[:, None],
+                                    dim=0, dim_size=ppr_idx[-1] + 1, reduce='sum')
+        return propagated_logits
+
+
+class MultiPPRGo(nn.Module):
+    def __init__(self, num_features, num_classes, hidden_size, nlayers, dropout):
+        super().__init__()
+        self.mlp = PPRGoMLP(num_features, num_classes, hidden_size, nlayers, dropout)
+
+    def forward(self, X, ppr_scores, ppr_idx):
+        logits = self.mlp(X)
+
+        """
+        https://pytorch-scatter.readthedocs.io/en/latest/functions/scatter.html
+        X: PPRの対象となる頂点 x 属性数
+        ppr_scores: X に対応するpprのスコア
+        ppr_idx: source となる頂点
+
+        XをNNにかけて出てきた特徴量を、pprで重み付けし、対応するsourceにsumで合わせる
+        """
         propagated_logits = scatter(logits * ppr_scores[:, None], ppr_idx[:, None],
                                     dim=0, dim_size=ppr_idx[-1] + 1, reduce='sum')
         return propagated_logits

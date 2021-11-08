@@ -19,8 +19,8 @@ class PPRDataset(torch.utils.data.Dataset):
         key = idx[0]
         if key not in self.cached:
             ppr_matrix = self.ppr_matrix[idx]
-            source_idx, neighbor_idx = ppr_matrix.nonzero()
-            ppr_scores = ppr_matrix.data
+            source_idx, neighbor_idx = ppr_matrix.nonzero() # 非ゼロの位置の頂点番号
+            ppr_scores = ppr_matrix.data # 非ゼロの実際の値
 
             attr_matrix = matrix_to_torch(self.attr_matrix_all[neighbor_idx])
             ppr_scores = torch.tensor(ppr_scores, dtype=torch.float32)
