@@ -35,3 +35,28 @@ class PPRGo(nn.Module):
         propagated_logits = scatter(logits * ppr_scores[:, None], ppr_idx[:, None],
                                     dim=0, dim_size=ppr_idx[-1] + 1, reduce='sum')
         return propagated_logits
+
+
+
+class MultiPPRGo(nn.Module):
+    def __init__(self, num_features, num_classes, num_ppr, hidden_size, nlayers, dropout):
+        super().__init__()
+        self.num_ppr = num_ppr
+        self.mlp = PPRGoMLP(num_features, hidden_size, hidden_size, nlayers, dropout)
+        self.linear_squeeze = nn.Linear(num_ppr, 1)
+        self.linear_head = nn.Linear(hidden_size, num_classes)
+
+    def forward(self, X, ppr_scores_list, ppr_idx_list):
+        logits = self.mlp(X)
+        propagated_logits_list = []
+        for i in range(self.num_ppr):
+            ppr_scores = ppr_scores_list[i]
+            ppr_idx = ppr_idx_list[i]
+            propagated_logits = scatter(logits * ppr_scores[:, None], ppr_idx[:, None],
+                                    dim=0, dim_size=ppr_idx[-1] + 1, reduce='sum')
+            propagated_logits_list.append(propagated_logits)
+
+        x_3d = torch.stack(propagated_logits_list, dim=3)
+        x_2d = self.linear_squeeze(x_3d).squeeze()
+        x_2d = self.linear_head(x_2d)
+        return x_2d

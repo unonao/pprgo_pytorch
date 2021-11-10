@@ -10,3 +10,8 @@ __pycache__
 db/
 configdb/
 slurm_out/
+
+.d000*
+/venv
+*.out
+*.err

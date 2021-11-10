@@ -9,7 +9,8 @@ install_requires = [
         "torch-sparse",
         "scikit-learn",
         "sacred",
-        "seml"
+        "seml",
+        'pyyaml',
 ]
 
 setup(
