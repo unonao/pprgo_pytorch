@@ -19,8 +19,8 @@ class SparseRowIndexer:
             indices.append(csr_matrix.indices[row_start:row_end])
             indptr.append(row_end - row_start)  # nnz of the row
 
-        self.data = np.array(data)
-        self.indices = np.array(indices)
+        self.data = np.array(data, dtype=object)
+        self.indices = np.array(indices, dtype=object)
         self.indptr = np.array(indptr)
         self.shape = csr_matrix.shape
 
@@ -101,7 +101,6 @@ def get_data(dataset_path, seed, ntrain_div_classes, normalize_attr=None):
     n_train = num_classes * ntrain_div_classes
     n_val = n_train * 10
     train_idx, val_idx, test_idx = split_random(seed, n, n_train, n_val)
-
 
     return g.adj_matrix, attr_matrix, g.labels, train_idx, val_idx, test_idx
 

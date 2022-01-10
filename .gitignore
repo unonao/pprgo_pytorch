@@ -1,3 +1,7 @@
+/log
+/config/normal_*
+/config/sapprgo_*
+
 .idea
 .vscode
 pprgo.egg-info
