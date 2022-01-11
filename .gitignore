@@ -2,6 +2,7 @@
 /config/normal_*
 /config/sapprgo_*
 /plot/result.csv
+/plot/*.png
 
 .idea
 .vscode
