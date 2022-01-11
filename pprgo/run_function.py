@@ -21,8 +21,7 @@ from logging import StreamHandler, FileHandler, Formatter
 from logging import INFO, DEBUG, NOTSET
 
 
-def run_one_pprgo_experiment(config):
-    logger = logging.getLogger(__name__)
+def run_one_pprgo_experiment(config, logger):
     logger.info('run_one_pprgo_experiment')
     '''
     # Set config
@@ -112,7 +111,7 @@ def run_one_pprgo_experiment(config):
         model=model, train_set=train_set, val_set=val_set,
         lr=lr, weight_decay=weight_decay,
         max_epochs=max_epochs, batch_size=batch_size, batch_mult_val=batch_mult_val,
-        eval_step=eval_step, early_stop=early_stop, patience=patience)
+        eval_step=eval_step, early_stop=early_stop, patience=patience, logger=logger)
     time_training = time.time() - start
     logging.info(f"Training Runtime: {time_training:.2f}s")
 
@@ -152,12 +151,10 @@ def run_one_pprgo_experiment(config):
     return acc_train, acc_val, acc_test, f1_train, f1_val, f1_test, time_total, time_preprocessing, time_training, time_inference, gpu_memory, memory
 
 
-def run_one_sapprgo_experiment(config):
+def run_one_sapprgo_experiment(config, logger):
     '''
     semi-adaptive pprgo
     '''
-
-    logger = logging.getLogger(__name__)
     logger.info('run_one_sapprgo_experiment')
 
     '''
@@ -266,7 +263,7 @@ def run_one_sapprgo_experiment(config):
         model=model, train_set=train_set, val_set=val_set,
         lr=lr, weight_decay=weight_decay,
         max_epochs=max_epochs, batch_size=batch_size, batch_mult_val=batch_mult_val,
-        eval_step=eval_step, early_stop=early_stop, patience=patience)
+        eval_step=eval_step, early_stop=early_stop, patience=patience, logger=logger)
     time_training = time.time() - start
     logging.info(f"Training Runtime: {time_training:.2f}s")
 
@@ -306,12 +303,12 @@ def run_one_sapprgo_experiment(config):
     return acc_train, acc_val, acc_test, f1_train, f1_val, f1_test, time_total, time_preprocessing, time_training, time_inference, gpu_memory, memory
 
 
-def run_one_experiment(config):
+def run_one_experiment(config, logger):
     # config に nsplit_alpha が含まれていれば run_one_sapprgo_experiment として実行
     if 'nsplit_alpha' in config:
-        return run_one_sapprgo_experiment(config)
+        return run_one_sapprgo_experiment(config, logger)
     else:
-        return run_one_pprgo_experiment(config)
+        return run_one_pprgo_experiment(config, logger)
 
 
 def run_experiment(config_path):
@@ -321,6 +318,9 @@ def run_experiment(config_path):
     '''
     # Set up logging
     '''
+    logging.basicConfig(level=DEBUG)
+    logger = logging.getLogger(config_name)
+    logger.setLevel(DEBUG)
     formatter = Formatter(
         fmt='%(asctime)s (%(levelname)s): %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S')
@@ -337,9 +337,9 @@ def run_experiment(config_path):
     )
     file_handler.setLevel(DEBUG)
     file_handler.setFormatter(formatter)
-    # ルートロガーの設定
-    logging.basicConfig(level=NOTSET, handlers=[stream_handler, file_handler])
-    logger = logging.getLogger(__name__)
+
+    logger.addHandler(stream_handler)
+    logger.addHandler(file_handler)
 
     logger.info('############################################################')
     '''
@@ -381,7 +381,7 @@ def run_experiment(config_path):
             torch.cuda.manual_seed_all(seed)
         # Run experiment
         acc_train, acc_val, acc_test, f1_train, f1_val, f1_test, time_total, time_preprocessing, time_training, time_inference, gpu_memory, memory \
-            = run_one_experiment(config)
+            = run_one_experiment(config, logger)
         acc_train_list.append(acc_train)
         acc_val_list.append(acc_val)
         acc_test_list.append(acc_test)

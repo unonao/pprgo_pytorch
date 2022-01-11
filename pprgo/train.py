@@ -1,4 +1,3 @@
-import logging
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -33,7 +32,7 @@ def run_batch(model, xbs, yb, optimizer, train):
 
 def train(model, train_set, val_set, lr, weight_decay,
           max_epochs=200, batch_size=512, batch_mult_val=4,
-          eval_step=1, early_stop=False, patience=50, ex=None):
+          eval_step=1, early_stop=False, patience=50, ex=None, logger=None):
     device = next(model.parameters()).device
 
     train_loader = torch.utils.data.DataLoader(
@@ -82,7 +81,7 @@ def train(model, train_set, val_set, lr, weight_decay,
 
                 if val_set is not None:
                     # update val stats
-                    rnd_idx = np.random.choice(len(val_set), size=batch_mult_val * batch_size, replace=False)
+                    rnd_idx = np.random.choice(len(val_set), size=min(len(val_set), batch_mult_val * batch_size), replace=False)
                     xbs, yb = val_set[rnd_idx]
                     xbs, yb = [xb.to(device) for xb in xbs], yb.to(device)
                     val_loss, val_ncorr = run_batch(model, xbs, yb, None, train=False)
@@ -93,8 +92,8 @@ def train(model, train_set, val_set, lr, weight_decay,
                     if ex is not None:
                         ex.current_run.info['val']['loss'].append(val_loss)
                         ex.current_run.info['val']['acc'].append(val_acc)
-
-                    logging.debug(f"Epoch {epoch}, step {step}: train {train_loss:.5f}, val {val_loss:.5f}")
+                    if logger is not None:
+                        logger.debug(f"Epoch {epoch}, step {step}: train {train_loss:.5f}, val {val_loss:.5f}")
 
                     if val_loss < best_loss:
                         best_loss = val_loss
@@ -108,7 +107,8 @@ def train(model, train_set, val_set, lr, weight_decay,
                         model.load_state_dict(best_state)
                         return epoch + 1, loss_hist, acc_hist
                 else:
-                    logging.debug(f"Epoch {epoch}, step {step}: train {train_loss:.5f}")
+                    if logger is not None:
+                        logger.debug(f"Epoch {epoch}, step {step}: train {train_loss:.5f}")
     if val_set is not None:
         model.load_state_dict(best_state)
     return epoch + 1, loss_hist, acc_hist
@@ -116,7 +116,7 @@ def train(model, train_set, val_set, lr, weight_decay,
 
 def train_sappr(model, train_set, val_set, lr, weight_decay,
                 max_epochs=200, batch_size=512, batch_mult_val=4,
-                eval_step=1, early_stop=False, patience=50, ex=None):
+                eval_step=1, early_stop=False, patience=50, ex=None, logger=None):
     device = next(model.parameters()).device
 
     train_loader = torch.utils.data.DataLoader(
@@ -177,7 +177,8 @@ def train_sappr(model, train_set, val_set, lr, weight_decay,
                         ex.current_run.info['val']['loss'].append(val_loss)
                         ex.current_run.info['val']['acc'].append(val_acc)
 
-                    logging.debug(f"Epoch {epoch}, step {step}: train {train_loss:.5f}, val {val_loss:.5f}")
+                    if logger is not None:
+                        logger.debug(f"Epoch {epoch}, step {step}: train {train_loss:.5f}, val {val_loss:.5f}")
 
                     if val_loss < best_loss:
                         best_loss = val_loss
@@ -191,7 +192,8 @@ def train_sappr(model, train_set, val_set, lr, weight_decay,
                         model.load_state_dict(best_state)
                         return epoch + 1, loss_hist, acc_hist
                 else:
-                    logging.debug(f"Epoch {epoch}, step {step}: train {train_loss:.5f}")
+                    if logger is not None:
+                        logger.debug(f"Epoch {epoch}, step {step}: train {train_loss:.5f}")
     if val_set is not None:
         model.load_state_dict(best_state)
     return epoch + 1, loss_hist, acc_hist
