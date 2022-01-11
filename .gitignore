@@ -1,6 +1,7 @@
 /log
 /config/normal_*
 /config/sapprgo_*
+/plot/result.csv
 
 .idea
 .vscode
