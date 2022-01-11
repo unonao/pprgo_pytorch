@@ -20,7 +20,7 @@ def value(col):
     if i < 0:
         return None
     else:
-        return col[i + 1:]
+        return col[i + 1:].replace(' ','')
 
 def key_value(col):
     i = col.find(':')
