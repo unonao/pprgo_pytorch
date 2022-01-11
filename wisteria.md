@@ -16,9 +16,9 @@
 ```
 pjsub --interact -L rscgrp=interactive-a,node=1 -g gs54
 
+module load gcc/8.3.1
 module load python/3.8.12
 module load cuda/11.1
-source venv/bin/activate
 
 python3 demo.py
 
@@ -39,6 +39,7 @@ Environment Modulesを使用してシステムにインストール済の環境�
 cd /work/gs54/s54002
 pjsub --interact -L rscgrp=interactive-a,node=1 -g gs54
 
+module load gcc/8.3.1
 module load python/3.8.12
 module load cuda/11.1
 
